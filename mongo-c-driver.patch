@@ -1,0 +1,52 @@
+diff --git a/src/libbson/src/bson/bson-json.c b/src/libbson/src/bson/bson-json.c
+index 913b908..55a571c 100644
+--- a/src/libbson/src/bson/bson-json.c
++++ b/src/libbson/src/bson/bson-json.c
+@@ -1086,7 +1086,7 @@ _is_known_key (const char *key, size_t len)
+    ret = (IS_KEY ("$regularExpression") || IS_KEY ("$regex") ||
+           IS_KEY ("$options") || IS_KEY ("$code") || IS_KEY ("$scope") ||
+           IS_KEY ("$oid") || IS_KEY ("$binary") || IS_KEY ("$type") ||
+-          IS_KEY ("$date") || IS_KEY ("$undefined") || IS_KEY ("$maxKey") ||
++          /* IS_KEY ("$date") || */ IS_KEY ("$undefined") || IS_KEY ("$maxKey") ||
+           IS_KEY ("$minKey") || IS_KEY ("$timestamp") ||
+           IS_KEY ("$numberInt") || IS_KEY ("$numberLong") ||
+           IS_KEY ("$numberDouble") || IS_KEY ("$numberDecimal") ||
+@@ -1210,8 +1210,15 @@ _bson_json_read_map_key (bson_json_reader_t *reader, /* IN */
+          HANDLE_OPTION ("$binary", BSON_TYPE_BINARY, BSON_JSON_LF_BINARY)
+       else if
+          HANDLE_OPTION ("$type", BSON_TYPE_BINARY, BSON_JSON_LF_TYPE)
++      /*
++       * Disable the following due to ModeShape's (mis)use of "$date" properties.
++       * ModeShape expects the value of "$date" properties to be an ISO 8601 string,
++       * instead of the dedicated binary representation (type 9).
++       */
++      /*
+       else if
+          HANDLE_OPTION ("$date", BSON_TYPE_DATE_TIME, BSON_JSON_LF_DATE)
++      */
+       else if
+          HANDLE_OPTION (
+             "$undefined", BSON_TYPE_UNDEFINED, BSON_JSON_LF_UNDEFINED)
+@@ -1704,11 +1711,21 @@ _bson_json_read_end_map (bson_json_reader_t *reader) /* IN */
+          bson->read_state = BSON_JSON_IN_BSON_TYPE_DBPOINTER_STARTMAP;
+          STACK_POP_DBPOINTER;
+       } else {
++         /*
++          * Disable the following check due to ModeShape's (mis)use of DBRef:
++          * an "$id" property is missing and a "$foreign" property is added.
++          * For example:
++          *   {
++                "$ref": "b2d9880317f1e7067ed002-86ac-49a1-b7bc-c15103d3a780",
++                "$foreign": true
++              }
++          */
++         /*
+          if (STACK_HAS_ID != STACK_HAS_REF) {
+             _bson_json_read_set_error (
+                reader, "%s", "DBRef object must have both $ref and $id keys");
+          }
+-
++         */
+          STACK_POP_DOC (
+             bson_append_document_end (STACK_BSON_PARENT, STACK_BSON_CHILD));
+       }

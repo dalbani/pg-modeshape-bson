@@ -1,0 +1,4 @@
+comment = 'An extension to read/write ModeShape BSON'
+default_version = '1.0'
+module_pathname = '$libdir/modeshape_bson'
+relocatable = false
