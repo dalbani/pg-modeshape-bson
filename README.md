@@ -31,7 +31,7 @@ CREATE TABLE modeshape
 CREATE TABLE modeshape_proxy
 (
   id text NOT NULL,
-  last_changed timestamp without time zone NOT NULL,
+  last_changed timestamp without time zone NOT NULL DEFAULT now(),
   content bytea NOT NULL
 );
 
