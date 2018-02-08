@@ -1,4 +1,4 @@
-comment = 'An extension to read/write ModeShape BSON'
+comment = 'An extension to convert ModeShape BSON from/to JSON'
 default_version = '1.0'
 module_pathname = '$libdir/modeshape_bson'
 relocatable = false
